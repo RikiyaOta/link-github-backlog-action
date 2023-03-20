@@ -17,30 +17,33 @@ jobs:
       
     steps:
 
-    - name: Check secrets about Backlog exist or not.
+    - name: Validate Backlog secrets.
       run: exit 1
       if: ${{ env.BACKLOG_PROJECT_KEY == '' || env.BACKLOG_FQDN == '' || env.BACKLOG_API_KEY == '' }}
-    
-    - name: Get the source branch name.
-      run: echo "SOURCE_BRANCH=${{ github.head_ref }}" >> $GITHUB_ENV
-      if: success()
-
-    - name: Validate the source branch name's pattern and get the issue key.
+        
+    - name: Validate and get the source branch name.
+      run: |
+        echo "SOURCE_BRANCH=${{ github.head_ref }}" >> $GITHUB_ENV
+        IS_VALID_BRANCH_NAME=$(./validate_branch_name.sh "$SOURCE_BRANCH" ${{ env.BACKLOG_PROJECT_KEY }})
+        echo "IS_VALID_BRANCH_NAME=$IS_VALID_BRANCH_NAME" >> $GITHUB_ENV
+        
+    - name: Get issue key.
+      # ここの正規表現のパターンを、validate_branch_name.sh の中のものと共通化したい。
       run: |
         if [[ "$SOURCE_BRANCH" =~ (${{ env.BACKLOG_PROJECT_KEY }}-[0-9]+) ]]; then
           echo "ISSUE_KEY=${BASH_REMATCH[1]}" >> $GITHUB_ENV
         fi
-      if: success()
+      if: ${{ env.IS_VALID_BRANCH_NAME }}
 
     - name: Get the current PR body
       run: |
         PULL_REQUEST_BODY=$(gh pr view ${{ github.event.number }} --json body -q ".body")
         echo "PULL_REQUEST_BODY=${PULL_REQUEST_BODY}" >> $GITHUB_ENV
-      if: success()
+      if: ${{ env.IS_VALID_BRANCH_NAME }}
         
     - name: Check the Pull Request Body
       run: echo "$PULL_REQUEST_BODY"
-      if: success()
+      if: ${{ env.IS_VALID_BRANCH_NAME }}
         
     - name: Add a issue URL to the pull request's body
       run: |
@@ -48,4 +51,4 @@ jobs:
         NEW_BODY="${NEW_LINE}\n\n${PULL_REQUEST_BODY}"
         echo -e "$NEW_BODY" > msg # Write a file temporally.
         export msg=$(cat msg) ; gh pr edit ${{ github.event.number }} --body "$msg"
-      if: success()
+      if: ${{ env.IS_VALID_BRANCH_NAME }}
