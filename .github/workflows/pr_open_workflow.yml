@@ -1,0 +1,36 @@
+name: Pull Request Opened Workflow
+
+on:
+  pull_request:
+    types: [opened]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+      
+    steps:
+
+    - name: Check secrets about Backlog exist or not.
+      run: exit 1
+      if: ${{ secrets.BACKLOG_PROJECT_KEY == '' || secrets.BACKLOG_FQDN == '' || secrets.BACKLOG_API_KEY == '' }}
+    
+    - name: Get the source branch name.
+      run: echo "SOURCE_BRANCH=${{ github.head_ref }}" >> $GITHUB_ENV
+      if: success()
+
+    - name: Validate the source branch name's pattern and get the issue key.
+      run: |
+        if [[ "$SOURCE_BRANCH" =~ (${{ secrets.BACKLOG_PROJECT_KEY }}-[0-9]+) ]]; then
+          echo "ISSUE_KEY=${BASH_REMATCH[1]}" >> $GITHUB_ENV
+        fi
+      if: success()
+
+    - name: Get the current PR body
+      run: |
+        PULL_REQUEST_BODY=$(gh pr view ${{ github.event.number }} --json body -q ".body")
+        echo "PULL_REQUEST_BODY=${PULL_REQUEST_BODY}" >> $GITHUB_ENV
+      if: success()
+        
+    - name: Check the Pull Request Body
+      run: echo "$PULL_REQUEST_BODY"
+      if: success()
