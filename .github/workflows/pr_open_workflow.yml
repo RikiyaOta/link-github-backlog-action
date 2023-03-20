@@ -5,14 +5,19 @@ on:
     types: [opened]
 
 jobs:
-  build:
+  handle_opened_pull_request:
     runs-on: ubuntu-latest
+      
+    env:
+      BACKLOG_PROJECT_KEY: ${{ secrets.BACKLOG_PROJECT_KEY }}
+      BACKLOG_FQDN: ${{ secrets.BACKLOG_FQDN }}
+      BACKLOG_API_KEY: ${{ secrets.BACKLOG_API_KEY }}
       
     steps:
 
     - name: Check secrets about Backlog exist or not.
       run: exit 1
-      if: ${{ secrets.BACKLOG_PROJECT_KEY == '' || secrets.BACKLOG_FQDN == '' || secrets.BACKLOG_API_KEY == '' }}
+      if: ${{ env.BACKLOG_PROJECT_KEY == '' || env.BACKLOG_FQDN == '' || env.BACKLOG_API_KEY == '' }}
     
     - name: Get the source branch name.
       run: echo "SOURCE_BRANCH=${{ github.head_ref }}" >> $GITHUB_ENV
@@ -20,7 +25,7 @@ jobs:
 
     - name: Validate the source branch name's pattern and get the issue key.
       run: |
-        if [[ "$SOURCE_BRANCH" =~ (${{ secrets.BACKLOG_PROJECT_KEY }}-[0-9]+) ]]; then
+        if [[ "$SOURCE_BRANCH" =~ (${{ env.BACKLOG_PROJECT_KEY }}-[0-9]+) ]]; then
           echo "ISSUE_KEY=${BASH_REMATCH[1]}" >> $GITHUB_ENV
         fi
       if: success()
