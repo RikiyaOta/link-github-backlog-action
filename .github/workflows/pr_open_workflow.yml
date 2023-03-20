@@ -10,6 +10,7 @@ jobs:
       
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GH_REPO: ${{ github.repository }}
       BACKLOG_PROJECT_KEY: ${{ secrets.BACKLOG_PROJECT_KEY }}
       BACKLOG_FQDN: ${{ secrets.BACKLOG_FQDN }}
       BACKLOG_API_KEY: ${{ secrets.BACKLOG_API_KEY }}
