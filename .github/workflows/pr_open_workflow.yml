@@ -46,4 +46,5 @@ jobs:
       run: |
         NEW_LINE="# Backlog Issue\n\nhttps://${BACKLOG_FQDN}/view/${ISSUE_KEY}"
         NEW_BODY="${NEW_LINE}\n\n${PULL_REQUEST_BODY}"
-        gh pr edit ${{ github.event.number }}  --body "$NEW_BODY"
+        echo -e "$NEW_BODY" > msg # Write a file temporally.
+        export msg=$(cat msg) ; gh pr edit ${{ github.event.number }} --body "$msg"
