@@ -19,10 +19,12 @@ jobs:
         
     - name: Validate and get the source branch name.
       run: |
-        echo "SOURCE_BRANCH=${{ github.head_ref }}" >> $GITHUB_ENV
-        echo "SOURCE_BRANCH=$SOURCE_BRANCH"
-        echo "BACKLOG_PROJECT_KEY=$BACKLOG_PROJECT_KEY"
-        echo "IS_VALID_BRANCH_NAME=$([[ $SOURCE_BRANCH =~ $BACKLOG_PROJECT_KEY-[0-9]+ ]] ; echo $?)" >> $GITHUB_ENV
+        SOURCE_BRANCH=${{ github.head_ref }}
+        echo "SOURCE_BRANCH=$SOURCE_BRANCH" >> $GITHUB_ENV
+
+        IS_VALID_BRANCH_NAME=$([[ $SOURCE_BRANCH =~ $BACKLOG_PROJECT_KEY-[0-9]+ ]] ; echo $?)
+        echo "IS_VALID_BRANCH_NAME=$IS_VALID_BRANCH_NAME" >> $GITHUB_ENV
+
         echo "IS_VALID_BRANCH_NAME=$IS_VALID_BRANCH_NAME"
       if: ${{ env.BACKLOG_PROJECT_KEY != '' }}
         
