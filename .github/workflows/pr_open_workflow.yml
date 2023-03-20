@@ -41,3 +41,9 @@ jobs:
     - name: Check the Pull Request Body
       run: echo "$PULL_REQUEST_BODY"
       if: success()
+        
+    - name: Add a issue URL to the pull request's body
+      run: |
+        NEW_LINE="# Backlog Issue\n\nhttps://${BACKLOG_FQDN}/view/${ISSUE_KEY}"
+        NEW_BODY="${NEW_LINE}\n\n${PULL_REQUEST_BODY}"
+        gh pr edit ${{ github.event.number }}  --body "$NEW_BODY"
