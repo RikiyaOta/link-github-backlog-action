@@ -45,6 +45,8 @@ jobs:
         echo "https//${BACKLOG_FQDN}/api/v2/issues/${ISSUE_KEY}"
         CURRENT_DESCRIPTION=$(curl "https://${BACKLOG_FQDN}/api/v2/issues/${ISSUE_KEY}?apiKey=${BACKLOG_API_KEY}" | jq '.description')
         NEW_DESCRIPTION="OPEN: ${NEW_LINE}\n${CURRENT_DESCRIPTION}"
+        echo -e "$NEW_DESCRIPTION" > msg # Write a file temporally.
+        export msg=$(cat msg)
         curl -X PATCH "https://${BACKLOG_FQDN}/api/v2/issues/${ISSUE_KEY}?apiKey=${BACKLOG_API_KEY}" \
           -H 'Content-Type: application/x-www-form-urlencoded' \
-          -d "description=${NEW_DESCRIPTION}"
+          -d "description=${msg}"
