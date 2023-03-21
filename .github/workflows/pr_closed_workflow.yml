@@ -1,0 +1,48 @@
+name: Pull Request Closed Workflow
+  
+on:
+  pull_request:
+      type: [closed]
+
+env:
+  BACKLOG_PROJECT_KEY: ${{ secrets.BACKLOG_PROJECT_KEY }}
+  BACKLOG_FQDN: ${{ secrets.BACKLOG_FQDN }}
+  BACKLOG_API_KEY: ${{ secrets.BACKLOG_API_KEY }}
+
+jobs:
+  handle_closed_pull_request:
+    runs-on: ubuntu-latest
+      
+    if: env.BACKLOG_PROJECT_KEY != '' && env.BACKLOG_FQDN != '' && env.BACKLOG_API_KEY != ''
+      
+    steps:
+      
+      - name: Validate and get the source branch name.
+        run: |
+          SOURCE_BRANCH=${{ github.head_ref }}
+          echo "SOURCE_BRANCH=$SOURCE_BRANCH" >> $GITHUB_ENV
+          IS_VALID_BRANCH_NAME=$([[ $SOURCE_BRANCH =~ $BACKLOG_PROJECT_KEY-[0-9]+ ]] ; echo $?)
+          echo "IS_VALID_BRANCH_NAME=$IS_VALID_BRANCH_NAME" >> $GITHUB_ENV
+
+      - name: Get issue key.
+        run: echo "ISSUE_KEY=$([[ $SOURCE_BRANCH =~ ($BACKLOG_PROJECT_KEY-[0-9]+) ]] ; echo ${BASH_REMATCH[1]})" >> $GITHUB_ENV
+        if: ${{ env.IS_VALID_BRANCH_NAME != '1' }}
+
+      - name: Update Backlog issue description.
+        run: |
+          CURRENT_DESCRIPTION=$(curl "https://${BACKLOG_FQDN}/api/v2/issues/${ISSUE_KEY}?apiKey=${BACKLOG_API_KEY}" | jq '.description' | sed 's/^"//;s/"$//')
+          PULL_REQUEST_URL=${{ github.event.pull_request.html_url }}
+          if [ ${{ github.event.pull_request.merged }} == 'true' ]; then
+            NEW_LABEL="✅ MERGED"
+          else
+            NEW_LABEL="❌ CLOSED"
+          fi
+          BEFORE_PATTERN=$(echo ":thumbsup: OPEN: ${PULL_REQUEST_URL}" | sed 's/\//\\\//g')
+          AFTER_PATTERN=$(echo "${NEW_LABEL}: ${PULL_REQUEST_URL}" | sed 's/\//\\\//g')
+          NEW_DESCRIPTION=$(echo "$CURRENT_DESCRIPTION" | sed "s/${BEFORE_PATTERN}/${AFTER_PATTERN}/")
+          echo -e "$NEW_DESCRIPTION" > msg
+          export msg=$(cat msg | sed 's/\\"/"/g')
+          curl -X PATCH "https://${BACKLOG_FQDN}/api/v2/issues/${ISSUE_KEY}?apiKey=${BACKLOG_API_KEY}" \
+            -H 'Content-Type: application/x-www-form-urlencoded' \
+            -d "description=${msg}"
+        if: ${{ env.IS_VALID_BRANCH_NAME != '1' }}
