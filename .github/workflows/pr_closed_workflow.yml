@@ -2,7 +2,7 @@ name: Pull Request Closed Workflow
   
 on:
   pull_request:
-      type: [closed]
+      types: [closed]
 
 env:
   BACKLOG_PROJECT_KEY: ${{ secrets.BACKLOG_PROJECT_KEY }}
