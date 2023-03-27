@@ -31,10 +31,9 @@ jobs:
     - name: Get the current PR body
       run: |
         PULL_REQUEST_BODY="$(gh pr view ${{ github.event.number }} --json body -q '.body')"
-        echo "--- Debug ---"
-        echo -E "PULL_REQUEST_BODY=${PULL_REQUEST_BODY}"
-        echo "--- Debug ---"
-        echo -E "PULL_REQUEST_BODY=${PULL_REQUEST_BODY}" >> $GITHUB_ENV
+        echo "PULL_REQUEST_BODY<<EOF" >> $GITHUB_ENV
+        echo "$PULL_REQUEST_BODY" >> $GITHUB_ENV
+        echo "EOF" >> $GITHUB_ENV
       if: ${{ env.BACKLOG_PROJECT_KEY != '' && env.BACKLOG_FQDN != '' && env.IS_VALID_BRANCH_NAME != '1' }}
         
     - name: Add a issue URL to the pull request's body
