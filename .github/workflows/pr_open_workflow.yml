@@ -9,7 +9,6 @@ env:
   GH_REPO: ${{ github.repository }}
   BACKLOG_PROJECT_KEY: ${{ secrets.BACKLOG_PROJECT_KEY }}
   BACKLOG_FQDN: ${{ secrets.BACKLOG_FQDN }}
-  BACKLOG_API_KEY: ${{ secrets.BACKLOG_API_KEY }}
 
 jobs:
   handle_opened_pull_request:
@@ -27,11 +26,11 @@ jobs:
         
     - name: Get issue key.
       run: echo "ISSUE_KEY=$([[ $SOURCE_BRANCH =~ ($BACKLOG_PROJECT_KEY-[0-9]+) ]] ; echo ${BASH_REMATCH[1]})" >> $GITHUB_ENV
-      if: ${{ env.BACKLOG_PROJECT_KEY != '' && env.BACKLOG_FQDN != '' && env.BACKLOG_API_KEY != '' && env.IS_VALID_BRANCH_NAME != '1' }}
+      if: ${{ env.BACKLOG_PROJECT_KEY != '' && env.BACKLOG_FQDN != '' && env.IS_VALID_BRANCH_NAME != '1' }}
 
     - name: Get the current PR body
       run: echo "PULL_REQUEST_BODY=$(gh pr view ${{ github.event.number }} --json body -q '.body')" >> $GITHUB_ENV
-      if: ${{ env.BACKLOG_PROJECT_KEY != '' && env.BACKLOG_FQDN != '' && env.BACKLOG_API_KEY != '' && env.IS_VALID_BRANCH_NAME != '1' }}
+      if: ${{ env.BACKLOG_PROJECT_KEY != '' && env.BACKLOG_FQDN != '' && env.IS_VALID_BRANCH_NAME != '1' }}
         
     - name: Add a issue URL to the pull request's body
       run: |
@@ -39,16 +38,4 @@ jobs:
         NEW_BODY="${NEW_LINE}\n\n${PULL_REQUEST_BODY}"
         echo -e "$NEW_BODY" > msg # Write a file temporally.
         export msg=$(cat msg) ; gh pr edit ${{ github.event.number }} --body "$msg"
-      if: ${{ env.BACKLOG_PROJECT_KEY != '' && env.BACKLOG_FQDN != '' && env.BACKLOG_API_KEY != '' && env.IS_VALID_BRANCH_NAME != '1' }}
-        
-    - name: Add a pull request URL to the Backlog issue.
-      run: |
-        NEW_LINE=${{ github.event.pull_request.html_url }}
-        CURRENT_DESCRIPTION=$(curl "https://${BACKLOG_FQDN}/api/v2/issues/${ISSUE_KEY}?apiKey=${BACKLOG_API_KEY}" | jq '.description' | sed 's/^"//;s/"$//')
-        NEW_DESCRIPTION=":thumbsup: OPEN: ${NEW_LINE}\n${CURRENT_DESCRIPTION}"
-        echo -e "$NEW_DESCRIPTION" > msg # Write a file temporally.
-        export msg=$(cat msg)
-        curl -X PATCH "https://${BACKLOG_FQDN}/api/v2/issues/${ISSUE_KEY}?apiKey=${BACKLOG_API_KEY}" \
-          -H 'Content-Type: application/x-www-form-urlencoded' \
-          -d "description=${msg}"
-      if: ${{ env.BACKLOG_PROJECT_KEY != '' && env.BACKLOG_FQDN != '' && env.BACKLOG_API_KEY != '' && env.IS_VALID_BRANCH_NAME != '1' }}
+      if: ${{ env.BACKLOG_PROJECT_KEY != '' && env.BACKLOG_FQDN != '' && env.IS_VALID_BRANCH_NAME != '1' }}
