@@ -1,0 +1,61 @@
+name: Link GitHub and Backlog Action
+author: RikiyaOta
+description: Link pull requests on GitHub and issues on Nulab's Backlog.
+  
+inputs:
+  github-token:
+    description: An access token automatically created in your workflow.
+    required: true
+  github-repo:
+    description: The repository where this action is executed.
+    required: true
+  backlog-project-key:
+    description: Your backlog project key.
+    required: true
+  backlog-fqdn:
+    description: You backlog FQDN.
+    required: true
+
+runs:
+  using: composite
+  env:
+    GITHUB_TOKEN: ${{ inputs.github-token }}
+    GH_REPO: ${{ inputs.github-repo }}
+    BACKLOG_PROJECT_KEY: ${{ inputs.backlog-project-key }}
+    BACKLOG_FQDN: ${{ inputs.backlog-fqdn }}
+  steps:
+    - name: Validate and get the source branch name.
+      shell: bash
+      run: |
+        SOURCE_BRANCH=${{ github.head_ref }}
+        echo "SOURCE_BRANCH=$SOURCE_BRANCH" >> $GITHUB_ENV
+        IS_VALID_BRANCH_NAME=$([[ $SOURCE_BRANCH =~ $BACKLOG_PROJECT_KEY-[0-9]+ ]] ; echo $?)
+        echo "IS_VALID_BRANCH_NAME=$IS_VALID_BRANCH_NAME" >> $GITHUB_ENV
+      if: ${{ env.BACKLOG_PROJECT_KEY != '' && env.BACKLOG_FQDN != '' }}
+        
+    - name: Get issue key.
+      shell: bash
+      run: echo "ISSUE_KEY=$([[ $SOURCE_BRANCH =~ ($BACKLOG_PROJECT_KEY-[0-9]+) ]] ; echo ${BASH_REMATCH[1]})" >> $GITHUB_ENV
+      if: ${{ env.BACKLOG_PROJECT_KEY != '' && env.BACKLOG_FQDN != '' && env.IS_VALID_BRANCH_NAME != '1' }}
+
+    - name: Get the current PR body
+      shell: bash
+      run: |
+        PULL_REQUEST_BODY="$(gh pr view ${{ github.event.number }} --json body -q '.body')"
+        echo "PULL_REQUEST_BODY<<EOF" >> $GITHUB_ENV
+        echo "$PULL_REQUEST_BODY" >> $GITHUB_ENV
+        echo "EOF" >> $GITHUB_ENV
+      if: ${{ env.BACKLOG_PROJECT_KEY != '' && env.BACKLOG_FQDN != '' && env.IS_VALID_BRANCH_NAME != '1' }}
+        
+    - name: Add a issue URL to the pull request's body
+      shell: bash
+      run: |
+        NEW_LINE="https://${BACKLOG_FQDN}/view/${ISSUE_KEY}"
+        NEW_BODY="${NEW_LINE}\n\n${PULL_REQUEST_BODY}"
+        echo -e "$NEW_BODY" > msg # Write a file temporally.
+        export msg=$(cat msg) ; gh pr edit ${{ github.event.number }} --body "$msg"
+      if: ${{ env.BACKLOG_PROJECT_KEY != '' && env.BACKLOG_FQDN != '' && env.IS_VALID_BRANCH_NAME != '1' }}
+        
+branding:
+  icon: link
+  color: green
