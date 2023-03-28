@@ -18,12 +18,19 @@ inputs:
 
 runs:
   using: composite
-  env:
-    GITHUB_TOKEN: ${{ inputs.github-token }}
-    GH_REPO: ${{ inputs.github-repo }}
-    BACKLOG_PROJECT_KEY: ${{ inputs.backlog-project-key }}
-    BACKLOG_FQDN: ${{ inputs.backlog-fqdn }}
   steps:
+    - name: Set environment variables.
+      shell: bash
+      run: |
+        GITHUB_TOKEN=${{ inputs.github-token }}
+        GH_REPO=${{ inputs.github-repo }}
+        BACKLOG_PROJECT_KEY=${{ inputs.backlog-project-key }}
+        BACKLOG_FQDN=${{ inputs.backlog-fqdn }}
+        echo "GITHUB_TOKEN=$GITHUB_TOKEN" >> $GITHUB_ENV
+        echo "GH_REPO=$GH_REPO" >> $GITHUB_ENV
+        echo "BACKLOG_PROJECT_KEY=$BACKLOG_PROJECT_KEY" >> $GITHUB_ENV
+        echo "BACKLOG_FQDN=$BACKLOG_FQDN" >> $GITHUB_ENV
+    
     - name: Validate and get the source branch name.
       shell: bash
       run: |
