@@ -2,6 +2,29 @@
 
 ## How to use
 
+
+### 1. Set your Backlog data.
+
+You must set 2 secrets:
+
+- BACKLOG_PROJECT_KEY
+- BACKLOG_FQDN
+
+If you don't know how to create your secrets, see [this](https://docs.github.com/en/actions/security-guides/encrypted-secrets#creating-encrypted-secrets-for-an-environment).
+
+### 2. Set your workflow permissions.
+
+This action writes a url to your pull request body, so your workflow must have write access permission.
+
+There are 2 ways:
+
+
+1. Change your workflow's default permissions. [See](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/enabling-features-for-your-repository/managing-github-actions-settings-for-a-repository#setting-the-permissions-of-the-github_token-for-your-repository).
+2. Specify your workflow permission in the workflow file. [See](https://docs.github.com/en/actions/security-guides/automatic-token-authentication#modifying-the-permissions-for-the-github_token).
+
+
+### 3. Use this action in your workflow.
+
 You can use this action like this.
 
 ```
