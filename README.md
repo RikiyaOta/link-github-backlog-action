@@ -24,7 +24,7 @@ jobs:
     steps:
         
     - name: Set Backlog issue URL.
-      uses: RikiyaOta/link-github-backlog-action@test-my-action/SAMPLE-1_hogehoge
+      uses: RikiyaOta/link-github-backlog-action@main
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         github-repo: ${{ github.repository }}
