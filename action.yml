@@ -3,12 +3,12 @@ author: RikiyaOta
 description: Link pull requests on GitHub and issues on Nulab's Backlog.
   
 inputs:
-  github-token:
-    description: An access token automatically created in your workflow.
-    required: true
-  github-repo:
-    description: The repository where this action is executed.
-    required: true
+  #github-token:
+  #  description: An access token automatically created in your workflow.
+  #  required: true
+  #github-repo:
+  #  description: The repository where this action is executed.
+  #  required: true
   backlog-project-key:
     description: Your backlog project key.
     required: true
