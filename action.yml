@@ -3,12 +3,6 @@ author: RikiyaOta
 description: Link pull requests on GitHub and issues on Nulab's Backlog.
   
 inputs:
-  #github-token:
-  #  description: An access token automatically created in your workflow.
-  #  required: true
-  #github-repo:
-  #  description: The repository where this action is executed.
-  #  required: true
   backlog-project-key:
     description: Your backlog project key.
     required: true
@@ -21,10 +15,6 @@ runs:
   steps:
     - name: Set environment variables.
       shell: bash
-      #GITHUB_TOKEN=${{ inputs.github-token }}
-      #GH_REPO=${{ inputs.github-repo }}
-      #echo "GITHUB_TOKEN=$GITHUB_TOKEN" >> $GITHUB_ENV
-      #echo "GH_REPO=$GH_REPO" >> $GITHUB_ENV
       run: |
         BACKLOG_PROJECT_KEY=${{ inputs.backlog-project-key }}
         BACKLOG_FQDN=${{ inputs.backlog-fqdn }}
