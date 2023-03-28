@@ -5,25 +5,26 @@
 You can use this action like this.
 
 ```
-name: Pull Request Opened Workflow (test)
+name: Your workflow name
 
 on:
   pull_request:
     types: [opened]
 
-env:
-  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  GH_REPO: ${{ github.repository }}
-
 jobs:
-  handle_opened_pull_request:
+  your_job_name:
     runs-on: ubuntu-latest
     steps:
     - name: Set Backlog issue URL.
       uses: RikiyaOta/link-github-backlog-action@main
+      # Required.
       with:
         backlog-project-key: ${{ secrets.BACKLOG_PROJECT_KEY }}
         backlog-fqdn: ${{ secrets.BACKLOG_FQDN }}
+      # Required.
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GH_REPO: ${{ github.repository }}
 ```
 
 ## Development
