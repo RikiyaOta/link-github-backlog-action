@@ -39,7 +39,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Set Backlog issue URL.
-      uses: RikiyaOta/link-github-backlog-action@main
+      uses: RikiyaOta/link-github-backlog-action@v1
       # Required.
       with:
         backlog-project-key: ${{ secrets.BACKLOG_PROJECT_KEY }}
