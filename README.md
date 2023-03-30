@@ -2,7 +2,6 @@
 
 ## How to use
 
-
 ### 1. Set your Backlog data.
 
 You must set 2 secrets:
@@ -49,6 +48,49 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         GH_REPO: ${{ github.repository }}
 ```
+
+
+## Features
+
+
+### 1. Set your Backlog issue's URL to the pull request description.
+
+For example, you will set 2 secrets like this:
+
+
+- BACKLOG_PROJECT_KEY = OUR_PRODUCT
+- BACKLOG_FQDN = our-company.backlog.com
+
+
+And then, you will work on a branch `fix/OUR_PRODUCT-123_fix-an-important-bug`.
+
+After finishing coding, you will open a new pull request and write following description:
+
+```
+# Abstract
+
+- This pull reqeust will fix an important bug.
+
+# Notes
+
+- This pull request is dummy.
+```
+
+In a result, this `link-github-backlog-action` will edit this pull request description like this:
+
+```
+https://our-company.backlog.com/views/OUR_PRODUCT-123
+
+# Abstract
+
+- This pull reqeust will fix an important bug.
+
+# Notes
+
+- This pull request is dummy.
+```
+
+So, you can access the Backlog issue easily.
 
 ## Development
 
