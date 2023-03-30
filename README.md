@@ -79,7 +79,7 @@ After finishing coding, you will open a new pull request and write following des
 In a result, this `link-github-backlog-action` will edit this pull request description like this:
 
 ```
-https://our-company.backlog.com/views/OUR_PRODUCT-123
+https://our-company.backlog.com/view/OUR_PRODUCT-123
 
 # Abstract
 
